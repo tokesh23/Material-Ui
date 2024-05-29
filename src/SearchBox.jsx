@@ -1,31 +1,40 @@
 import React, { useState } from 'react';
 import TextField from '@mui/material/TextField';
-import { Button } from '@mui/material';
+import Button from '@mui/material/Button';
 import './SearchBox.css';
 
-const SearchBox = () => {
+const SearchBox = ({ updateInfo }) => {
+   
+
+    const [city, setCity] = useState("");
+    const [error, setError] = useState(false);
+
     const API_URL = "https://api.openweathermap.org/data/2.5/weather";
     const API_KEY = "259faf99e79471d328a370b9280b4acb";
-    
-    const [city, setCity] = useState("");
 
-    const getweatherInfo = async () => {
+    const getWeatherInfo = async () => {
         try {
-            let response = await fetch(`${API_URL}?q=${city}&appid=${API_KEY}&units=metric`);
-            let jsonResponse = await response.json();
-           
-            let result ={
-                temp:jsonResponse.main.temp,
-                tempmin:jsonResponse.main.temp_min,
-                tempmax:jsonResponse.main.temp_max,
-                humidity:jsonResponse.main.humidity,
-                feelslike:jsonResponse.main.feels_like,
-                weather:jsonResponse    .weather[0].description,
-                
+            const response = await fetch(`${API_URL}?q=${city}&appid=${API_KEY}&units=metric`);
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
             }
-            console.log(result)
+            const jsonResponse = await response.json();
+
+            const result = {
+                city: city,
+                temp: jsonResponse.main.temp,
+                tempMin: jsonResponse.main.temp_min,
+                tempMax: jsonResponse.main.temp_max,
+                humidity: jsonResponse.main.humidity,
+                feelsLike: jsonResponse.main.feels_like,
+                weather: jsonResponse.weather[0].description,
+            };
+
+            console.log(result);
+            setError(""); // Clear any previous errors
+            return result;
         } catch (error) {
-            console.error("Error fetching weather data:", error);
+            throw error 
         }
     };
 
@@ -33,20 +42,24 @@ const SearchBox = () => {
         setCity(evt.target.value);
     };
 
-    const handleSubmit = (evt) => {
+    const handleSubmit = async (evt) => {
+       try {
         evt.preventDefault();
         console.log(city);
-        getweatherInfo();
-        setCity(""); // Clear the input after submitting
+        setCity("")
+         let newInfo =await getWeatherInfo();
+         updateInfo (newInfo);
+       } catch (error) {
+        setError(true);
+       }
     };
 
     return (
         <div className='searchBox'>
-            <h3>Search for the weather</h3>
             <form onSubmit={handleSubmit}>
                 <TextField
                     id="city"
-                    label="Outlined"
+                    label="City"
                     variant="outlined"
                     required
                     value={city}
@@ -56,8 +69,9 @@ const SearchBox = () => {
                 <br />
                 <Button variant="contained" type='submit'>Search</Button>
             </form>
+            {error && <p style={{color: "red"}}>No such place exist!</p>}
         </div>
     );
-}
+};
 
 export default SearchBox;
