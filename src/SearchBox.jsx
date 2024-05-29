@@ -4,8 +4,6 @@ import Button from '@mui/material/Button';
 import './SearchBox.css';
 
 const SearchBox = ({ updateInfo }) => {
-   
-
     const [city, setCity] = useState("");
     const [error, setError] = useState(false);
 
@@ -31,10 +29,11 @@ const SearchBox = ({ updateInfo }) => {
             };
 
             console.log(result);
-            setError(""); // Clear any previous errors
+            setError(false); // Clear any previous errors
             return result;
         } catch (error) {
-            throw error 
+            setError(true); // Set error state
+            throw error;
         }
     };
 
@@ -43,15 +42,17 @@ const SearchBox = ({ updateInfo }) => {
     };
 
     const handleSubmit = async (evt) => {
-       try {
         evt.preventDefault();
         console.log(city);
-        setCity("")
-         let newInfo =await getWeatherInfo();
-         updateInfo (newInfo);
-       } catch (error) {
-        setError(true);
-       }
+
+        try {
+            let newInfo = await getWeatherInfo();
+            updateInfo(newInfo);
+        } catch (error) {
+            console.error("Error fetching weather data: ", error);
+        }
+
+        setCity(""); // Clear input field after submit
     };
 
     return (
@@ -69,7 +70,7 @@ const SearchBox = ({ updateInfo }) => {
                 <br />
                 <Button variant="contained" type='submit'>Search</Button>
             </form>
-            {error && <p style={{color: "red"}}>No such place exist!</p>}
+            {error && <p style={{ color: "red" }}>No such place exist!</p>}
         </div>
     );
 };

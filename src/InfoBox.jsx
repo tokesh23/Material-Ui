@@ -5,9 +5,10 @@ import CardMedia from '@mui/material/CardMedia';
 
 import Typography from '@mui/material/Typography';
 import './InfoBox.css'
-import BeachAccessIcon from '@mui/icons-material/BeachAccess';
-import AcUnitIcon from '@mui/icons-material/AcUnit';
+import ThunderstormIcon from '@mui/icons-material/Thunderstorm';
+
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
+import AcUnitIcon from '@mui/icons-material/AcUnit';
 
 
 function InfoBox({ info }) {
@@ -39,7 +40,16 @@ function InfoBox({ info }) {
                     />
                     <CardContent>
                         <Typography gutterBottom variant="h5" component="div">
-                            {info.city} {info.humidity > 80 ?   Rain_URL : info.temp > 15 ? HOT_URL: Cold_URL}
+                             {info.city}{""}
+                             {info.humidity >80?(
+                                <ThunderstormIcon/>
+                             ):info.temp>15?(
+                                <WbSunnyIcon/>
+                          
+                             ):(
+                                <AcUnitIcon/>
+                             )
+                            }
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                             <p >temperature ={info.temp}&deg:c</p>
